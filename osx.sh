@@ -2,6 +2,7 @@
 
 # include my library helpers for colorized echo and require_brew, etc
 source ./lib.sh
+
 # Ask for the administrator password upfront
 bot "I need you to enter your sudo password so I can install some things:"
 sudo -v
@@ -82,6 +83,7 @@ require_brew git
 require_brew hub
 require_brew tig
 require_brew git-flow
+require_brew imagemagick
 require_brew imagesnap
 require_brew jq
 require_brew redis
@@ -89,6 +91,7 @@ require_brew node
 require_brew dos2unix
 require_brew ack
 require_brew nmap
+require_brew ttyrec
 require_brew tree
 require_brew gnupg
 
@@ -671,8 +674,8 @@ running "Load new settings before rebuilding the index"
 killall mds > /dev/null 2>&1;ok
 running "Make sure indexing is enabled for the main volume"
 sudo mdutil -i on / > /dev/null;ok
-running "Rebuild the index from scratch"
-sudo mdutil -E / > /dev/null;ok
+#running "Rebuild the index from scratch"
+#sudo mdutil -E / > /dev/null;ok
 
 ###############################################################################
 bot "Terminal & iTerm2!"
@@ -809,16 +812,13 @@ cp -r configs/Preferences.sublime-settings ~/Library/Application\ Support/Sublim
 bot "NPM Globals..."
 ###############################################################################
 
+require_npm antic
 require_npm bower
-require_npm coffee-script
 require_npm forever
 require_npm gulp
-require_npm js-complexity-viz
 require_npm jshint
-require_npm meteorite
 require_npm prettyjson
 require_npm repl-client
-require_npm replify
 require_npm supervisor
 require_npm yo
 
