@@ -115,8 +115,11 @@ require_cask skydrive
 require_cask adium
 require_cask slack
 
-# tools
+# comics
 require_cask comicbooklover
+require_cask sequential
+
+# tools
 require_cask diffmerge
 #require_cask flash-player
 require_cask github
@@ -126,11 +129,11 @@ require_cask iterm2
 require_cask lastpass-universal
 #require_cask macvim
 require_cask sizeup
-require_cask simple-comic
 require_cask sketchup
 require_cask sublime-text
 require_cask the-unarchiver
 #require_cask transmission
+require_cask utorrent
 require_cask vlc
 require_cask xquartz
 
