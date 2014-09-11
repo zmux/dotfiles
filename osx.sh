@@ -15,26 +15,25 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 # install homebrew
 #####
 
+running "checking homebrew"
 brew_bin=$(which brew) 2>&1 > /dev/null
 if [[ $? != 0 ]]; then
+	action "installing homebrew"
     ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
-else
-    ok "$brew_bin installed"
+    if [[ $? != 0 ]]; then
+    	error "unable to install homebrew, script $0 abort!"
+    	exit -1
+	fi
 fi
-if [[ $? != 0 ]]; then
-    error "unable to install homebrew, script $0 failed"
-    exit -1
-fi
+ok
 
+running "checking brew-cask"
 output=$(brew tap | grep cask)
-if [[ $? = 0 ]]; then
-    ok "caskroom/cask is installed"
-else
+if [[ $? != 0 ]]; then
+	action "installing brew-cask"
 	require_brew caskroom/cask/brew-cask
-    # tap
-    brew tap caskroom/cask > /dev/null 2>&1
-    require_brew brew-cask
 fi
+ok
 
 ###############################################################################
 #Install command-line tools using Homebrew                                    #
@@ -50,6 +49,8 @@ brew upgrade
 ok "brews updated..."
 
 action "installing packages..."
+
+
 # Install GNU core utilities (those that come with OS X are outdated)
 # Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
 require_brew coreutils
@@ -57,46 +58,62 @@ require_brew coreutils
 require_brew moreutils
 # Install GNU `find`, `locate`, `updatedb`, and `xargs`, `g`-prefixed
 require_brew findutils
-# Install GNU `sed`, overwriting the built-in `sed`
-require_brew gnu-sed --default-names
+
 # Install Bash 4
 # Note: don’t forget to add `/usr/local/bin/bash` to `/etc/shells` before running `chsh`.
 #install bash
 #install bash-completion
-
-# Install wget with IRI support
-require_brew wget --enable-iri
 
 # Install RingoJS and Narwhal
 # Note that the order in which these are installed is important; see http://git.io/brew-narwhal-ringo.
 #install ringojs
 #install narwhal
 
-# Install more recent versions of some OS X tools
-require_brew vim --override-system-vi
-require_brew homebrew/dupes/grep
-require_brew homebrew/dupes/screen
-#install homebrew/php/php55 --with-gmp
-
 # Install other useful binaries
+require_brew ack
+# dos2unix converts windows newlines to unix newlines
+require_brew dos2unix
+# fortune command--I source this as a better motd :)
+require_brew fortune
+require_brew gawk
+# http://www.lcdf.org/gifsicle/ (because I'm a gif junky)
+require_brew gifsicle
+# skip those GUI clients, git command-line all the way
 require_brew git
-require_brew hub
-require_brew tig
+# yes, yes, use git-flow, please :)
 require_brew git-flow
+# why is everyone still not using GPG?
+require_brew gnupg
+# Install GNU `sed`, overwriting the built-in `sed`
+# so we can do "sed -i 's/foo/bar' file" instead of "sed -i '' 's/foo/bar' file"
+require_brew gnu-sed --default-names
+# better, more recent grep
+require_brew homebrew/dupes/grep
+require_brew hub
 require_brew imagemagick
 require_brew imagesnap
+# jq is a JSON grep
 require_brew jq
-require_brew redis
-require_brew node
-require_brew dos2unix
-require_brew ack
+# http://maven.apache.org/
+require_brew maven
+require_brew memcached
 require_brew nmap
-require_brew ttyrec
+require_brew node
+require_brew redis
+# better/more recent version of screen
+require_brew homebrew/dupes/screen
+require_brew tig
 require_brew tree
-require_brew gnupg
+require_brew ttyrec
+# better, more recent vim
+require_brew vim --override-system-vi
+# Install wget with IRI support
+require_brew wget --enable-iri
 
-# fortune command :)
-require_brew fortune
+bot "if you would like to start memcached at login, run this:"
+echo "ln -sfv /usr/local/opt/memcached/*.plist ~/Library/LaunchAgents"
+bot "if you would like to start memcached now, run this:"
+echo "launchctl load ~/Library/LaunchAgents/homebrew.mxcl.memcached.plist"
 
 ###############################################################################
 # Native Apps (via brew cask)                                                 #
@@ -709,6 +726,12 @@ running "Don’t display the annoying prompt when quitting iTerm"
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false;ok
 running "hide tab title bars"
 defaults write com.googlecode.iterm2 HideTab -bool true;ok
+running "set system-wide hotkey to show/hide iterm with ^\`"
+defaults write com.googlecode.iterm2 Hotkey -bool true;
+defaults write com.googlecode.iterm2 HotkeyChar -int 96;
+defaults write com.googlecode.iterm2 HotkeyCode -int 50;
+defaults write com.googlecode.iterm2 HotkeyModifiers -int 262401;
+ok
 
 # running "Make iTerm2 load new tabs in the same directory"
 # defaults export com.googlecode.iterm2 /tmp/plist
@@ -818,8 +841,11 @@ bot "NPM Globals..."
 require_npm antic
 require_npm bower
 require_npm forever
+require_npm grunt
 require_npm gulp
 require_npm jshint
+# http://devo.ps/blog/goodbye-node-forever-hello-pm2/
+require_npm pm2
 require_npm prettyjson
 require_npm repl-client
 require_npm supervisor

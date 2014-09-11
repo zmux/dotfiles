@@ -12,7 +12,7 @@ Note that your shell includes the full path + the git branch!
 \\[._.]/ - I'm so excited I just binaried in my pants!
 
 ## Watch me run!
-![Running](http://media.giphy.com/media/ToMjGplenNcvja2RUf6/giphy.gif)
+![Running](http://media.giphy.com/media/5xtDarwenxEoFeIMEM0/giphy.gif)
 
 ## Acquiring This Repo
 This project contains submodules. Clone this into your home directory.
@@ -30,7 +30,9 @@ git clone --recurse-submodules https://github.com/atomantic/dotfiles ~/.dotfiles
 
 > Note: running install.sh is idempotent. You can run it again and again as you add new features or software to the scripts! I'll regularly add new configurations so keep an eye on this repo as it grows and optimizes.
 
+## ¯\\_(ツ)_/¯ Warning / Liability
 > Warning: If you have existing dotfiles for configuring git, zsh, vim, etc, these will be destroyed and replaced. You might want to save any special configs and add them to a fork of this repo before installing :)
+The creator of this repo is not responsible if your machine ends up in a state you are not happy with. If you are concerned, look at install.sh and osx.sh to review everything this script will do to your machine :)
 
 ## Additional
 

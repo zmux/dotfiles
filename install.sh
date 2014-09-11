@@ -62,7 +62,6 @@ if [[ ${PIPESTATUS[0]} != 0 ]]; then
 else
   echo
   bot "looks like you are already using gnu-sed. woot!"
-  sed -i 's/Adam Eivy/'$firstname' '$lastname'/' .gitconfig;
   sed -i 's/adam.eivy@disney.com/'$email'/' .gitconfig;
   sed -i 's/atomantic/'$githubuser'/' .gitconfig;
   sed -i 's/antic/'$(whoami)'/g' .zshrc;ok
@@ -112,13 +111,10 @@ function symlinkifne {
     fi
 }
 
-symlinkifne .bowerrc
 symlinkifne .crontab
 symlinkifne .gemrc
 symlinkifne .gitconfig
 symlinkifne .gitignore
-symlinkifne .hgrc
-symlinkifne .npmrc
 symlinkifne .profile
 symlinkifne .rvmrc
 symlinkifne .screenrc
