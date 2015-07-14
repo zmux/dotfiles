@@ -4,22 +4,38 @@
 source ./lib.sh
 
 # Ask for the administrator password upfront
-bot "I need you to enter your sudo password so I can install some things:"
-sudo -v
 
-# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+bot "checking sudo state..."
+if sudo grep -q "# %wheel\tALL=(ALL) NOPASSWD: ALL" "/etc/sudoers"; then
 
+  promptSudo
+
+  bot "Do you want me to setup this machine to allow you to run sudo without a password?\nPlease read here to see what I am doing:\nhttp://wiki.summercode.com/sudo_without_a_password_in_mac_os_x \n"
+
+  read -r -p "Make sudo passwordless? [y|N] " response
+
+  if [[ $response =~ (yes|y|Y) ]];then
+      sed --version
+      if [[ $? == 0 ]];then
+          sudo sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+      else
+          sudo sed -i '' 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
+      fi
+      sudo dscl . append /Groups/wheel GroupMembership $(whoami)
+      bot "You can now run sudo commands without password!"
+  fi
+fi
+ok
 
 #####
 # install homebrew
 #####
 
-running "checking homebrew"
+running "checking homebrew install"
 brew_bin=$(which brew) 2>&1 > /dev/null
 if [[ $? != 0 ]]; then
 	action "installing homebrew"
-    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     if [[ $? != 0 ]]; then
     	error "unable to install homebrew, script $0 abort!"
     	exit -1
@@ -27,7 +43,7 @@ if [[ $? != 0 ]]; then
 fi
 ok
 
-running "checking brew-cask"
+running "checking brew-cask install"
 output=$(brew tap | grep cask)
 if [[ $? != 0 ]]; then
 	action "installing brew-cask"
@@ -38,17 +54,23 @@ ok
 ###############################################################################
 #Install command-line tools using Homebrew                                    #
 ###############################################################################
-bot "installing command-line tools via homebrew..."
 # Make sure we’re using the latest Homebrew
-action "update brew..."
+running "updating homebrew"
 brew update
-ok "brew updated..."
-# Upgrade any already-installed formulae
-action "upgrade brew packages..."
-brew upgrade
-ok "brews updated..."
+ok
 
-action "installing packages..."
+bot "before installing brew packages, we can upgrade any outdated packages."
+read -r -p "run brew upgrade? [y|N] " response
+if [[ $response =~ ^(y|yes|Y) ]];then
+    # Upgrade any already-installed formulae
+    action "upgrade brew packages..."
+    brew upgrade
+    ok "brews updated..."
+else
+    ok "skipped brew package upgrades.";
+fi
+
+bot "installing homebrew command-line tools"
 
 
 # Install GNU core utilities (those that come with OS X are outdated)
@@ -71,6 +93,14 @@ require_brew findutils
 
 # Install other useful binaries
 require_brew ack
+# Beanstalk http://kr.github.io/beanstalkd/
+#require_brew beanstalkd
+# ln -sfv /usr/local/opt/beanstalk/*.plist ~/Library/LaunchAgents
+# launchctl load ~/Library/LaunchAgents/homebrew.mxcl.beanstalk.plist
+
+# docker setup:
+require_brew boot2docker
+
 # dos2unix converts windows newlines to unix newlines
 require_brew dos2unix
 # fortune command--I source this as a better motd :)
@@ -85,8 +115,9 @@ require_brew git-flow
 # why is everyone still not using GPG?
 require_brew gnupg
 # Install GNU `sed`, overwriting the built-in `sed`
-# so we can do "sed -i 's/foo/bar' file" instead of "sed -i '' 's/foo/bar' file"
+# so we can do "sed -i 's/foo/bar/' file" instead of "sed -i '' 's/foo/bar/' file"
 require_brew gnu-sed --default-names
+require_brew go
 # better, more recent grep
 require_brew homebrew/dupes/grep
 require_brew hub
@@ -98,7 +129,8 @@ require_brew jq
 require_brew maven
 require_brew memcached
 require_brew nmap
-require_brew node
+# require_brew node
+require_brew nvm
 require_brew redis
 # better/more recent version of screen
 require_brew homebrew/dupes/screen
@@ -107,6 +139,7 @@ require_brew tree
 require_brew ttyrec
 # better, more recent vim
 require_brew vim --override-system-vi
+require_brew watch
 # Install wget with IRI support
 require_brew wget --enable-iri
 
@@ -115,6 +148,41 @@ echo "ln -sfv /usr/local/opt/memcached/*.plist ~/Library/LaunchAgents"
 bot "if you would like to start memcached now, run this:"
 echo "launchctl load ~/Library/LaunchAgents/homebrew.mxcl.memcached.plist"
 
+# nvm
+require_nvm stable
+
+###############################################################################
+bot "NPM Globals..."
+###############################################################################
+
+require_npm antic
+require_npm bower
+# http://ionicframework.com/
+# require_npm cordova
+# require_npm ionic
+require_npm yo
+# https://github.com/markdalgleish/bespoke.js
+require_npm generator-bespoke
+# require_npm grunt
+require_npm gulp
+require_npm jshint
+# http://devo.ps/blog/goodbye-node-forever-hello-pm2/
+require_npm pm2
+require_npm prettyjson
+# require_npm supervisor
+# https://github.com/sindresorhus/trash
+require_npm trash
+# https://github.com/MrRio/vtop
+require_npm vtop
+
+###############################################################################
+bot "Ruby Gems..."
+###############################################################################
+require_brew rbenv
+require_brew ruby-build
+eval "$(rbenv init -)"
+require_gem git-up
+
 ###############################################################################
 # Native Apps (via brew cask)                                                 #
 ###############################################################################
@@ -122,21 +190,20 @@ bot "installing GUI tools via homebrew casks..."
 brew tap caskroom/versions > /dev/null 2>&1
 
 # cloud storage
-require_cask amazon-cloud-drive
+#require_cask amazon-cloud-drive
 require_cask box-sync
-require_cask dropbox
-require_cask evernote
-require_cask skydrive
+#require_cask dropbox
+#require_cask evernote
+#require_cask skydrive
 
 # communication
-require_cask adium
+#require_cask adium
 require_cask slack
 
-# comics
-require_cask comicbooklover
-require_cask sequential
+require_cask caffeine
 
 # tools
+require_cask comicbooklover
 require_cask diffmerge
 #require_cask flash-player
 require_cask github
@@ -146,8 +213,12 @@ require_cask iterm2
 require_cask lastpass-universal
 #require_cask macvim
 require_cask sizeup
-require_cask sketchup
-require_cask sublime-text
+#require_cask simple-comic
+#require_cask sketchup
+require_cask atom
+# require_apm linter
+# require_apm linter-eslint
+# require_apm atom-beautify
 require_cask the-unarchiver
 #require_cask transmission
 require_cask utorrent
@@ -155,24 +226,26 @@ require_cask vlc
 require_cask xquartz
 
 # development browsers
-require_cask breach
-require_cask firefox
+# require_cask breach
+# require_cask firefox
 #require_cask firefox-aurora
 require_cask google-chrome
-require_cask google-chrome-canary
-require_cask torbrowser
+# require_cask google-chrome-canary
+# require_cask torbrowser
 
 # virtal machines
 require_cask virtualbox
 # chef-dk, berkshelf, etc
-require_cask chefdk
+#require_cask chefdk
 # vagrant for running dev environments using docker images
-require_cask vagrant # # | grep Caskroom | sed "s/.*'\(.*\)'.*/open \1\/Vagrant.pkg/g" | sh
+#require_cask vagrant # # | grep Caskroom | sed "s/.*'\(.*\)'.*/open \1\/Vagrant.pkg/g" | sh
 
-bot "Alright, cleaning up homebrew cache..."
+
+
+# bot "Alright, cleaning up homebrew cache..."
 # Remove outdated versions from the cellar
-brew cleanup > /dev/null 2>&1
-bot "All clean"
+# brew cleanup > /dev/null 2>&1
+# bot "All clean"
 
 ###############################################################################
 bot "Configuring General System UI/UX..."
@@ -191,7 +264,7 @@ sudo pmset -a hibernatemode 0;ok
 
 running "Remove the sleep image file to save disk space"
 sudo rm -rf /Private/var/vm/sleepimage;ok
-running "Create a zero-byte file instead…"
+running "Create a zero-byte file instead"
 sudo touch /Private/var/vm/sleepimage;ok
 running "…and make sure it can’t be rewritten"
 sudo chflags uchg /Private/var/vm/sleepimage;ok
@@ -255,7 +328,7 @@ sudo chflags uchg /Private/var/vm/sleepimage;ok
 #running "Add a spacer to the right side of the Dock (where the Trash is)"
 #defaults write com.apple.dock persistent-others -array-add '{tile-data={}; tile-type="spacer-tile";}';ok
 
-running "Set a custom wallpaper image."
+running "Set a custom wallpaper image"
 # `DefaultDesktop.jpg` is already a symlink, and
 # all wallpapers are in `/Library/Desktop Pictures/`. The default is `Wave.jpg`.
 rm -rf ~/Library/Application Support/Dock/desktoppicture.db
@@ -409,7 +482,7 @@ running "Disable auto-correct"
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false;ok
 
 ###############################################################################
-bot "Configuring the Screen!"
+bot "Configuring the Screen"
 ###############################################################################
 
 running "Require password immediately after sleep or screen saver begins"
@@ -432,7 +505,7 @@ running "Enable HiDPI display modes (requires restart)"
 sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true;ok
 
 ###############################################################################
-bot "Finder Configs!"
+bot "Finder Configs"
 ###############################################################################
 
 running "Allow quitting via ⌘ + Q; doing so will also hide desktop icons"
@@ -513,7 +586,7 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 	Privileges -bool true;ok
 
 ###############################################################################
-bot "Dock & Dashboard!"
+bot "Dock & Dashboard"
 ###############################################################################
 
 running "Enable highlight hover effect for the grid view of a stack (Dock)"
@@ -574,7 +647,7 @@ running "Add iOS Simulator to Launchpad"
 sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app" "/Applications/iOS Simulator.app";ok
 
 
-bot "Configuring Hot Corners!"
+bot "Configuring Hot Corners"
 # Possible values:
 #  0: no-op
 #  2: Mission Control
@@ -637,7 +710,7 @@ running "Add a context menu item for showing the Web Inspector in web views"
 defaults write NSGlobalDomain WebKitDeveloperExtras -bool true;ok
 
 ###############################################################################
-bot "Configuring Mail!"
+bot "Configuring Mail"
 ###############################################################################
 
 
@@ -663,7 +736,7 @@ running "Disable automatic spell checking"
 defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled";ok
 
 ###############################################################################
-bot "Spotlight!"
+bot "Spotlight"
 ###############################################################################
 
 # running "Hide Spotlight tray-icon (and subsequent helper)"
@@ -698,21 +771,21 @@ sudo mdutil -i on / > /dev/null;ok
 #sudo mdutil -E / > /dev/null;ok
 
 ###############################################################################
-bot "Terminal & iTerm2!"
+bot "Terminal & iTerm2"
 ###############################################################################
 
-running "Only use UTF-8 in Terminal.app"
-defaults write com.apple.terminal StringEncodings -array 4;ok
-
-running "Use a modified version of the Solarized Dark theme by default in Terminal.app"
-TERM_PROFILE='Solarized Dark xterm-256color';
-CURRENT_PROFILE="$(defaults read com.apple.terminal 'Default Window Settings')";
-if [ "${CURRENT_PROFILE}" != "${TERM_PROFILE}" ]; then
-	open "./configs/${TERM_PROFILE}.terminal";
-	sleep 1; # Wait a bit to make sure the theme is loaded
-	defaults write com.apple.terminal 'Default Window Settings' -string "${TERM_PROFILE}";
-	defaults write com.apple.terminal 'Startup Window Settings' -string "${TERM_PROFILE}";
-fi;
+# running "Only use UTF-8 in Terminal.app"
+# defaults write com.apple.terminal StringEncodings -array 4;ok
+#
+# running "Use a modified version of the Solarized Dark theme by default in Terminal.app"
+# TERM_PROFILE='Solarized Dark xterm-256color';
+# CURRENT_PROFILE="$(defaults read com.apple.terminal 'Default Window Settings')";
+# if [ "${CURRENT_PROFILE}" != "${TERM_PROFILE}" ]; then
+# 	open "./configs/${TERM_PROFILE}.terminal";
+# 	sleep 1; # Wait a bit to make sure the theme is loaded
+# 	defaults write com.apple.terminal 'Default Window Settings' -string "${TERM_PROFILE}";
+# 	defaults write com.apple.terminal 'Startup Window Settings' -string "${TERM_PROFILE}";
+# fi;
 
 #running "Enable “focus follows mouse” for Terminal.app and all X11 apps"
 # i.e. hover over a window and start typing in it without clicking first
@@ -740,7 +813,7 @@ ok
 
 
 ###############################################################################
-bot "Time Machine!"
+bot "Time Machine"
 ###############################################################################
 
 running "Prevent Time Machine from prompting to use new hard drives as backup volume"
@@ -750,7 +823,7 @@ running "Disable local Time Machine backups"
 hash tmutil &> /dev/null && sudo tmutil disablelocal;ok
 
 ###############################################################################
-bot "Activity Monitor!"
+bot "Activity Monitor"
 ###############################################################################
 
 running "Show the main window when launching Activity Monitor"
@@ -767,7 +840,7 @@ defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
 defaults write com.apple.ActivityMonitor SortDirection -int 0;ok
 
 ###############################################################################
-bot "Address Book, Dashboard, iCal, TextEdit, and Disk Utility!"
+bot "Address Book, Dashboard, iCal, TextEdit, and Disk Utility"
 ###############################################################################
 
 running "Enable the debug menu in Address Book"
@@ -787,7 +860,7 @@ defaults write com.apple.DiskUtility DUDebugMenuEnabled -bool true
 defaults write com.apple.DiskUtility advanced-image-options -bool true;ok
 
 ###############################################################################
-bot "Mac App Store!"
+bot "Mac App Store"
 ###############################################################################
 
 running "Enable the WebKit Developer Tools in the Mac App Store"
@@ -797,7 +870,7 @@ running "Enable Debug Menu in the Mac App Store"
 defaults write com.apple.appstore ShowDebugMenu -bool true;ok
 
 ###############################################################################
-bot "Messages!"
+bot "Messages"
 ###############################################################################
 
 running "Disable automatic emoji substitution (i.e. use plain text smileys)"
@@ -818,7 +891,7 @@ defaults write com.google.Chrome ExtensionInstallSources -array "https://gist.gi
 defaults write com.google.Chrome.canary ExtensionInstallSources -array "https://gist.githubusercontent.com/" "http://userscripts.org/*";ok
 
 ###############################################################################
-bot "SizeUp.app!"
+bot "SizeUp.app"
 ###############################################################################
 
 running "Start SizeUp at login"
@@ -826,35 +899,6 @@ defaults write com.irradiatedsoftware.SizeUp StartAtLogin -bool true;ok
 
 running "Don’t show the preferences window on next start"
 defaults write com.irradiatedsoftware.SizeUp ShowPrefsOnNextStart -bool false;ok
-
-###############################################################################
-bot "Sublime Text!"
-###############################################################################
-
-running "Install Sublime Text settings"
-cp -r configs/Preferences.sublime-settings ~/Library/Application\ Support/Sublime\ Text*/Packages/User/Preferences.sublime-settings 2> /dev/null;ok
-
-###############################################################################
-bot "NPM Globals..."
-###############################################################################
-
-require_npm antic
-require_npm bower
-require_npm forever
-require_npm grunt
-require_npm gulp
-require_npm jshint
-# http://devo.ps/blog/goodbye-node-forever-hello-pm2/
-require_npm pm2
-require_npm prettyjson
-require_npm repl-client
-require_npm supervisor
-require_npm yo
-
-###############################################################################
-bot "Ruby Gems..."
-###############################################################################
-require_gem git-up
 
 
 ###############################################################################
