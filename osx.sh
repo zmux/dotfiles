@@ -192,8 +192,8 @@ brew tap caskroom/versions > /dev/null 2>&1
 # cloud storage
 #require_cask amazon-cloud-drive
 require_cask box-sync
-#require_cask dropbox
-#require_cask evernote
+require_cask dropbox
+require_cask evernote
 #require_cask skydrive
 
 # communication
@@ -216,10 +216,10 @@ require_cask sizeup
 #require_cask simple-comic
 #require_cask sketchup
 require_cask atom
-# require_apm linter
-# require_apm linter-eslint
-# require_apm atom-beautify
-require_cask the-unarchiver
+require_apm linter
+require_apm linter-eslint
+require_apm atom-beautify
+#require_cask the-unarchiver
 #require_cask transmission
 require_cask utorrent
 require_cask vlc
