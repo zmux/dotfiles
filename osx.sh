@@ -8,14 +8,19 @@ source ./lib.sh
 bot "checking sudo state..."
 if sudo grep -q "# %wheel\tALL=(ALL) NOPASSWD: ALL" "/etc/sudoers"; then
 
-  promptSudo
+  # Ask for the administrator password upfront
+  bot "I need you to enter your sudo password so I can install some things:"
+  sudo -v
+
+  # Keep-alive: update existing sudo time stamp until the script has finished
+  while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
   bot "Do you want me to setup this machine to allow you to run sudo without a password?\nPlease read here to see what I am doing:\nhttp://wiki.summercode.com/sudo_without_a_password_in_mac_os_x \n"
 
   read -r -p "Make sudo passwordless? [y|N] " response
 
   if [[ $response =~ (yes|y|Y) ]];then
-      sed --version
+      sed --version 2>&1 > /dev/null
       if [[ $? == 0 ]];then
           sudo sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
       else
@@ -120,21 +125,17 @@ require_brew gnu-sed --default-names
 require_brew go
 # better, more recent grep
 require_brew homebrew/dupes/grep
-require_brew hub
 require_brew imagemagick
 require_brew imagesnap
 # jq is a JSON grep
 require_brew jq
 # http://maven.apache.org/
 require_brew maven
-require_brew memcached
 require_brew nmap
 # require_brew node
 require_brew nvm
-require_brew redis
 # better/more recent version of screen
 require_brew homebrew/dupes/screen
-require_brew tig
 require_brew tree
 require_brew ttyrec
 # better, more recent vim
@@ -142,11 +143,6 @@ require_brew vim --override-system-vi
 require_brew watch
 # Install wget with IRI support
 require_brew wget --enable-iri
-
-bot "if you would like to start memcached at login, run this:"
-echo "ln -sfv /usr/local/opt/memcached/*.plist ~/Library/LaunchAgents"
-bot "if you would like to start memcached now, run this:"
-echo "launchctl load ~/Library/LaunchAgents/homebrew.mxcl.memcached.plist"
 
 # nvm
 require_nvm stable
@@ -156,16 +152,20 @@ bot "NPM Globals..."
 ###############################################################################
 
 require_npm antic
+require_npm buzzphrase
 require_npm bower
+require_npm bower-check-updates
+require_npm npm-check
 # http://ionicframework.com/
 # require_npm cordova
 # require_npm ionic
 require_npm yo
 # https://github.com/markdalgleish/bespoke.js
 require_npm generator-bespoke
+require_npm generator-dockerize
 # require_npm grunt
 require_npm gulp
-require_npm jshint
+require_npm eslint
 # http://devo.ps/blog/goodbye-node-forever-hello-pm2/
 require_npm pm2
 require_npm prettyjson
@@ -178,6 +178,7 @@ require_npm vtop
 ###############################################################################
 bot "Ruby Gems..."
 ###############################################################################
+sudo chown -R $(whoami) /Library/Ruby/Gems/2.0.0
 require_brew rbenv
 require_brew ruby-build
 eval "$(rbenv init -)"
@@ -234,7 +235,7 @@ require_cask google-chrome
 # require_cask torbrowser
 
 # virtal machines
-require_cask virtualbox
+# require_cask virtualbox
 # chef-dk, berkshelf, etc
 #require_cask chefdk
 # vagrant for running dev environments using docker images
