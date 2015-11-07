@@ -104,7 +104,7 @@ require_brew ack
 # launchctl load ~/Library/LaunchAgents/homebrew.mxcl.beanstalk.plist
 
 # docker setup:
-require_brew boot2docker
+# require_brew boot2docker
 
 # dos2unix converts windows newlines to unix newlines
 require_brew dos2unix
@@ -130,7 +130,7 @@ require_brew imagesnap
 # jq is a JSON grep
 require_brew jq
 # http://maven.apache.org/
-require_brew maven
+# require_brew maven
 require_brew nmap
 # require_brew node
 require_brew nvm
@@ -195,16 +195,16 @@ brew tap caskroom/versions > /dev/null 2>&1
 require_cask box-sync
 require_cask dropbox
 require_cask evernote
-#require_cask skydrive
+require_cask skydrive
 
 # communication
 #require_cask adium
 require_cask slack
 
-require_cask caffeine
+# require_cask caffeine
 
 # tools
-require_cask comicbooklover
+# require_cask comicbooklover
 require_cask diffmerge
 #require_cask flash-player
 require_cask github
