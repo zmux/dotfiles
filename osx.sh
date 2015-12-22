@@ -218,6 +218,7 @@ require_cask atom
 require_apm linter
 require_apm linter-eslint
 require_apm atom-beautify
+require_apm auto-update-packages
 #require_cask the-unarchiver
 #require_cask transmission
 require_cask utorrent
