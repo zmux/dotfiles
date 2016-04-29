@@ -118,7 +118,10 @@ function curlhammer () {
   done
   bot "done"
 }
-
 function dockershell () {
   bash --login '/Applications/Docker/Docker Quickstart Terminal.app/Contents/Resources/Scripts/start.sh'
 }
+function regmr () {
+  for d in $(find . -type d -name .git); do ( mr register $d/.. ); done
+}
+

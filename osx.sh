@@ -85,6 +85,12 @@ require_brew moreutils
 # Install GNU `find`, `locate`, `updatedb`, and `xargs`, `g`-prefixed
 require_brew findutils
 
+# https://myrepos.branchable.com/
+require_brew mr
+require_brew vcsh
+require_brew gource
+require_brew ffmpeg
+
 # Install Bash 4
 # Note: don’t forget to add `/usr/local/bin/bash` to `/etc/shells` before running `chsh`.
 #install bash
