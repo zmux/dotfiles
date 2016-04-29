@@ -1,20 +1,61 @@
 # \\[._.]/ - Hi, I'm the OSX bot
 
-I will update your OSX machine with better system defaults, preferences, software configuration and even auto-install some handy development tools and apps that my developer friends find helpful.
+I will update your OSX machine with Better™ system defaults, preferences, software configuration and even auto-install some handy development tools and apps that my developer friends find helpful.
 
 You don't need to install or configure anything upfront! This works with a brand-new machine from the factory as well as an existing machine that you've been working with for years.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Forget About Manual Configuration!](#forget-about-manual-configuration)
+- [Watch me run!](#watch-me-run)
+- [Running](#running)
+  - [Restoring Dotfiles](#restoring-dotfiles)
+- [Additional](#additional)
+  - [VIM as IDE](#vim-as-ide)
+  - [Crontab](#crontab)
+  - [Remap Caps-Lock](#remap-caps-lock)
+- [Settings](#settings)
+  - [Configuring General System UI/UX](#configuring-general-system-uiux)
+  - [Standard System Changes](#standard-system-changes)
+  - [Trackpad, mouse, keyboard, Bluetooth accessories, and input](#trackpad-mouse-keyboard-bluetooth-accessories-and-input)
+  - [Configuring the Screen](#configuring-the-screen)
+  - [Finder Configs](#finder-configs)
+  - [Dock & Dashboard](#dock-&-dashboard)
+  - [Configuring Hot Corners](#configuring-hot-corners)
+  - [Configuring Safari & WebKit](#configuring-safari-&-webkit)
+  - [Configuring Mail](#configuring-mail)
+  - [Spotlight](#spotlight)
+  - [iTerm2](#iterm2)
+  - [Time Machine](#time-machine)
+  - [Activity Monitor](#activity-monitor)
+  - [Address Book, Dashboard, iCal, TextEdit, and Disk Utility](#address-book-dashboard-ical-textedit-and-disk-utility)
+  - [Mac App Store](#mac-app-store)
+  - [Messages](#messages)
+  - [Google Chrome](#google-chrome)
+  - [SizeUp.app](#sizeupapp)
+- [Contributions](#contributions)
+- [Loathing, Mehs and Praise](#loathing-mehs-and-praise)
+- [¯\\_(ツ)_/¯ Warning / Liability](#%C2%AF%5C%5C_%E3%83%84_%C2%AF-warning--liability)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Forget About Manual Configuration!
 
 Don't you hate getting a new laptop or joining a new team and then spending a whole day setting up your system preferences and tools? Me too. That's why we automate; we did it once and we don't want to do have to do it again.
 
-\\[^_^]/ - This started as Adam Eivy's OSX shell configuration dotfiles but has grown to a mutil-developer platform for machine configuration.
+\\[^_^]/ - This started as [Adam Eivy](http://adameivy.com)'s OSX shell configuration dotfiles but has grown to a mutil-developer platform for machine configuration.
 
 When I finish with your machine, you will be able to look at your command-line in full-screen mode like this (running iTerm):
 
-![iTerm Screenshot](https://raw.githubusercontent.com/atomantic/dotfiles/master/img/dotfiles.png)
+![iTerm Screenshot](https://raw.githubusercontent.com/atomantic/dotfiles/master/img/term.png)
 
 Check out how your shell prompt includes the full path & the working git branch!
+The top terminal is using vim + NerdTree as a full Atom replacement IDE.
+The bottom left is a git terminal.
+The bottom right is running `vtop`
+
+
 \\[._.]/ - I'm so excited I just binaried in my pants!
 
 # Watch me run!
@@ -31,21 +72,24 @@ cd ~/.dotfiles;
 
 > Note: running install.sh is idempotent. You can run it again and again as you add new features or software to the scripts! I'll regularly add new configurations so keep an eye on this repo as it grows and optimizes.
 
-# Restoring Dotfiles
+## Restoring Dotfiles
 
 If you have existing dotfiles for configuring git, zsh, vim, etc, these will be backed-up into ~/.dotfiles_backup and replaced with the files from this project. You can restore your original dotfiles by using `./restore.sh`
 
-# ¯\\_(ツ)_/¯ Warning / Liability
-> Warning:
-The creator of this repo is not responsible if your machine ends up in a state you are not happy with. If you are concerned, look at install.sh and osx.sh to review everything this script will do to your machine :)
-
 # Additional
 
-There are a few additional features in this repo:
+## VIM as IDE
+I am moving away from using Atom and instead using vim as my IDE. I use Vundle to manage vim plugins (instead of pathogen). Vundle is better in many ways and is compatible with pathogen plugins. Additionally, vundle will manage and install it's own plugins so we don't have to use git submodules for all of them.
+To install plugins with vundle, pop open vim and run `:PluginInstall`
 
-- .crontab: you can `cron ~/.crontab` if you want to add my nightly cron software updates.
+## Crontab
+You can `cron ~/.crontab` if you want to add my nightly cron software updates.
 
 > \\[0_0]/ - Note that this may wake you in the morning to compatibility issues so use only if you like being on the edge
+
+## Remap Caps-Lock
+- I highly recommend remapping your Caps Lock key to Control per [Dr. Bunsen](http://www.drbunsen.org/remapping-caps-lock/):
+![Remap Caps Lock](https://raw.githubusercontent.com/atomantic/dotfiles/master/img/remap_capslock.png)
 
 # Settings
 This project changes a number of settings and configures software on OSX.
@@ -216,15 +260,12 @@ Here is the current list:
 - Disable smart quotes as it’s annoying for messages that contain code
 - Disable continuous spell checking
 
-## Google Chrome & Google Chrome Canary
+## Google Chrome 
 - Allow installing user scripts via GitHub Gist or Userscripts.org
 
 ## SizeUp.app
 - Start SizeUp at login
 - Don’t show the preferences window on next start
-
-## Atom Editor Text
-- Install [Atom](https://atom.io/)
 
 # Contributions
 Contributions are always welcome in the form of pull requests with explanatory comments.
@@ -238,9 +279,7 @@ Please refer to the [Contributor Covenant](https://github.com/atomantic/dotfiles
 4. Praise should be directed to [@antic](http://twitter.com/antic) or [@matthewmccull](http://twitter.com/matthewmccull) or [@mathiasbynens](https://github.com/mathiasbynens/dotfiles)
 
 
-# Release History
+# ¯\\_(ツ)_/¯ Warning / Liability
+> Warning:
+The creator of this repo is not responsible if your machine ends up in a state you are not happy with. If you are concerned, look at install.sh and osx.sh to review everything this script will do to your machine :)
 
-### <sup>v1.1.0</sup>
- * Added dotfiles backup and restore.sh script
-     * you can now restore your previous dotfiles with ./restore.sh
- * prompting the user more (e.g. `brew upgrade` is now optional)

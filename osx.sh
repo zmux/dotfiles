@@ -21,10 +21,9 @@ if sudo grep -q "# %wheel\tALL=(ALL) NOPASSWD: ALL" "/etc/sudoers"; then
 
   if [[ $response =~ (yes|y|Y) ]];then
       sed --version 2>&1 > /dev/null
+      sudo sed -i '' 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
       if [[ $? == 0 ]];then
           sudo sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
-      else
-          sudo sed -i '' 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD:\s\+ALL\)/\1/' /etc/sudoers
       fi
       sudo dscl . append /Groups/wheel GroupMembership $(whoami)
       bot "You can now run sudo commands without password!"
@@ -105,7 +104,6 @@ require_brew ack
 
 # docker setup:
 # note, instead, use https://github.com/atomantic/generator-dockerize for dev tooling
-# require_brew boot2docker
 
 # dos2unix converts windows newlines to unix newlines
 require_brew dos2unix
@@ -116,14 +114,14 @@ require_brew gawk
 require_brew gifsicle
 # skip those GUI clients, git command-line all the way
 require_brew git
-# yes, yes, use git-flow, please :)
-require_brew git-flow
+# no longer recommending git-flow:
+# require_brew git-flow
 # why is everyone still not using GPG?
 require_brew gnupg
 # Install GNU `sed`, overwriting the built-in `sed`
 # so we can do "sed -i 's/foo/bar/' file" instead of "sed -i '' 's/foo/bar/' file"
 require_brew gnu-sed --default-names
-require_brew go
+#require_brew go
 # better, more recent grep
 require_brew homebrew/dupes/grep
 require_brew imagemagick
@@ -135,9 +133,12 @@ require_brew jq
 require_brew nmap
 # require_brew node
 require_brew nvm
+require_brew openconnect
 require_brew ruby
 # better/more recent version of screen
 require_brew homebrew/dupes/screen
+require_brew tmux
+require_brew reattach-to-user-namespace
 require_brew tree
 require_brew ttyrec
 # better, more recent vim
@@ -145,6 +146,11 @@ require_brew vim --override-system-vi
 require_brew watch
 # Install wget with IRI support
 require_brew wget --enable-iri
+# update zsh to latest
+require_brew zsh
+# set zsh as the user login shell
+bot "setting newer homebrew zsh (/usr/local/bin/zsh) as your shell (password required)"
+chsh -s /usr/local/bin/zsh
 
 # nvm
 require_nvm stable
@@ -157,16 +163,18 @@ require_npm antic
 require_npm buzzphrase
 require_npm bower
 require_npm bower-check-updates
+require_npm instant-markdown-d
 require_npm npm-check
 # http://ionicframework.com/
 # require_npm cordova
 # require_npm ionic
 require_npm yo
 # https://github.com/markdalgleish/bespoke.js
-require_npm generator-bespoke
+# require_npm generator-bespoke
 require_npm generator-dockerize
 # require_npm grunt
 require_npm gulp
+require_npm esformatter
 require_npm eslint
 # NOTE: now using PM2 and forever in docker containers (not in host)
 # http://devo.ps/blog/goodbye-node-forever-hello-pm2/
@@ -214,12 +222,13 @@ require_cask iterm2
 require_cask sizeup
 #require_cask simple-comic
 #require_cask sketchup
-require_cask atom
-require_apm linter
-require_apm linter-eslint
-require_apm atom-beautify
-require_apm auto-update-packages
-#require_cask the-unarchiver
+
+# require_cask atom
+# require_apm linter
+# require_apm linter-eslint
+# require_apm atom-beautify
+
+# require_cask the-unarchiver
 #require_cask transmission
 require_cask utorrent
 require_cask vlc
@@ -230,7 +239,6 @@ require_cask xquartz
 # require_cask firefox
 #require_cask firefox-aurora
 require_cask google-chrome
-# require_cask google-chrome-canary
 # require_cask torbrowser
 
 # virtal machines
@@ -244,8 +252,8 @@ require_cask google-chrome
 
 # bot "Alright, cleaning up homebrew cache..."
 # Remove outdated versions from the cellar
-# brew cleanup > /dev/null 2>&1
-# bot "All clean"
+brew cleanup > /dev/null 2>&1
+bot "All clean"
 
 ###############################################################################
 bot "Configuring General System UI/UX..."
@@ -332,8 +340,10 @@ running "Set a custom wallpaper image"
 # `DefaultDesktop.jpg` is already a symlink, and
 # all wallpapers are in `/Library/Desktop Pictures/`. The default is `Wave.jpg`.
 rm -rf ~/Library/Application Support/Dock/desktoppicture.db
-sudo rm -rf /System/Library/CoreServices/DefaultDesktop.jpg
-sudo ln -s ~/.dotfiles/img/wallpaper.jpg /System/Library/CoreServices/DefaultDesktop.jpg;ok
+sudo rm -f /System/Library/CoreServices/DefaultDesktop.jpg
+sudo rm -f /Library/Desktop\ Pictures/El\ Capitan.jpg
+sudo cp ./img/wallpaper.jpg /System/Library/CoreServices/DefaultDesktop.jpg;
+sudo cp ./img/wallpaper.jpg /Library/Desktop\ Pictures/El\ Capitan.jpg;ok
 
 
 ################################################
@@ -788,10 +798,11 @@ bot "Terminal & iTerm2"
 # fi;
 
 #running "Enable “focus follows mouse” for Terminal.app and all X11 apps"
-# i.e. hover over a window and start typing in it without clicking first
+# i.e. hover over a window and start `typing in it without clicking first
 #defaults write com.apple.terminal FocusFollowsMouse -bool true
 #defaults write org.x.X11 wm_ffm -bool true;ok
-
+running "Installing the Solarized Light theme for iTerm (opening file)"
+open "./configs/Solarized Light.itermcolors";ok
 running "Installing the Solarized Dark theme for iTerm (opening file)"
 open "./configs/Solarized Dark.itermcolors";ok
 
@@ -883,12 +894,11 @@ running "Disable continuous spell checking"
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false;ok
 
 ###############################################################################
-bot "Google Chrome & Google Chrome Canary"
+bot "Google Chrome"
 ###############################################################################
 
 running "Allow installing user scripts via GitHub Gist or Userscripts.org"
 defaults write com.google.Chrome ExtensionInstallSources -array "https://gist.githubusercontent.com/" "http://userscripts.org/*"
-defaults write com.google.Chrome.canary ExtensionInstallSources -array "https://gist.githubusercontent.com/" "http://userscripts.org/*";ok
 
 ###############################################################################
 bot "SizeUp.app"
