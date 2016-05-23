@@ -34,12 +34,14 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
-Plugin 'scrooloose/syntastic'
-Plugin 'millermedeiros/vim-esformatter'
-" https://github.com/plasticboy/vim-markdown
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
 Plugin 'suan/vim-instant-markdown'
+" language tools
+Plugin 'scrooloose/syntastic'
+Plugin 'millermedeiros/vim-esformatter'
+Plugin 'digitaltoad/vim-pug'
+"Plugin 'sheerun/vim-polyglot'
 
 " plugin from http://vim-scripts.org/vim/scripts.html
 Plugin 'node.js'
@@ -222,6 +224,7 @@ au BufRead,BufNewFile *.rb,*.rhtml set tabstop=2
 au BufRead,BufNewFile *.rb,*.rhtml set shiftwidth=2
 au BufRead,BufNewFile *.rb,*.rhtml set softtabstop=2
 au BufRead,BufNewFile *.otl set syntax=blockhl
+au BufRead,BufNewFile *.json set syntax=javascript
 au FileType python set omnifunc=pythoncomplete#Complete
 au FileType javascript set omnifunc=javascriptcomplete#CompleteJS
 au FileType html set omnifunc=htmlcomplete#CompleteTags
@@ -266,6 +269,7 @@ set statusline+=%*
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
-"let g:syntastic_check_on_wq = 0
+let g:syntastic_check_on_wq = 0
 let g:syntastic_enable_eslint_checker = 1
 let g:syntastic_javascript_checkers = ['eslint']
+"let g:syntastic_pug_checkers = ['jade']

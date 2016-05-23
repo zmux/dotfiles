@@ -32,6 +32,11 @@ source /usr/local/opt/nvm/nvm.sh
 # Customize to your needs...
 unsetopt correct
 
-nvm use stable
 # run fortune on new terminal :)
 fortune
+
+# The next line updates PATH for the Google Cloud SDK.
+source '/Users/eivya001/Downloads/google-cloud-sdk/path.zsh.inc'
+
+# The next line enables shell command completion for gcloud.
+source '/Users/eivya001/Downloads/google-cloud-sdk/completion.zsh.inc'

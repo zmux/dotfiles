@@ -140,8 +140,6 @@ require_brew nmap
 # require_brew node
 require_brew nvm
 require_brew openconnect
-require_brew ruby
-# better/more recent version of screen
 require_brew homebrew/dupes/screen
 require_brew tmux
 require_brew reattach-to-user-namespace
@@ -159,7 +157,7 @@ bot "setting newer homebrew zsh (/usr/local/bin/zsh) as your shell (password req
 chsh -s /usr/local/bin/zsh
 
 # nvm
-require_nvm stable
+require_nvm 4.4.4
 
 ###############################################################################
 bot "NPM Globals..."
@@ -169,6 +167,8 @@ require_npm antic
 require_npm buzzphrase
 require_npm bower
 require_npm bower-check-updates
+require_npm esformatter
+require_npm eslint
 require_npm instant-markdown-d
 require_npm npm-check
 # http://ionicframework.com/
@@ -180,8 +180,6 @@ require_npm yo
 require_npm generator-dockerize
 # require_npm grunt
 require_npm gulp
-require_npm esformatter
-require_npm eslint
 # NOTE: now using PM2 and forever in docker containers (not in host)
 # http://devo.ps/blog/goodbye-node-forever-hello-pm2/
 # require_npm pm2
@@ -236,8 +234,7 @@ require_cask sizeup
 
 # require_cask the-unarchiver
 #require_cask transmission
-require_cask utorrent
-require_cask vlc
+# require_cask vlc
 require_cask xquartz
 
 # development browsers

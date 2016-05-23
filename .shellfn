@@ -124,4 +124,3 @@ function dockershell () {
 function regmr () {
   for d in $(find . -type d -name .git); do ( mr register $d/.. ); done
 }
-
