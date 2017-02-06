@@ -17,6 +17,7 @@ module.exports = {
     // Install GNU `sed`, overwriting the built-in `sed`
     // so we can do "sed -i 's/foo/bar/' file" instead of "sed -i '' 's/foo/bar/' file"
     'gnu-sed --with-default-names',
+    'gradle',
     // better, more recent grep
     'homebrew/dupes/grep',
     // https://github.com/jkbrzt/httpie
@@ -27,6 +28,7 @@ module.exports = {
     'jq',
     // Mac App Store CLI: https://github.com/mas-cli/mas
     'mas',
+    'maven',
     // Install some other useful utilities like `sponge`
     'moreutils',
     'nmap',
@@ -45,26 +47,27 @@ module.exports = {
     'wireshark'
   ],
   cask: [
+    'alfred',
     'atom',
+    'bartender',
+    'calibre',
+    'docker',
     'evernote',
+    'flux',
     'gpgtools',
+    'intellij-idea-ce',
     'iterm2',
+    'java',
     'slack',
     'the-unarchiver',
     'transmission',
     'vlc',
     'xquartz',
-    'intellij-idea-ce',
-    'alfred',
     'skype',
-    'calibre',
-    'docker',
-    'flux',
     'teamviewer',
     'tomighty',
-    'bartender',
-    'screenhero',
     'selfcontrol'
+    'screenhero',
   ],
   gem: [
     'git-up'
