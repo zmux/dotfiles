@@ -13,8 +13,6 @@ module.exports = {
     'findutils',
     'fortune',
     'gawk',
-    // http://www.lcdf.org/gifsicle/ (because I'm a gif junky)
-    'gifsicle',
     'gnupg',
     // Install GNU `sed`, overwriting the built-in `sed`
     // so we can do "sed -i 's/foo/bar/' file" instead of "sed -i '' 's/foo/bar/' file"
@@ -43,14 +41,14 @@ module.exports = {
     'vim --with-override-system-vi',
     'watch',
     // Install wget with IRI support
-    'wget --enable-iri'
+    'wget --enable-iri',
+    'wireshark'
   ],
   cask: [
     'atom',
     'evernote',
     'gpgtools',
     'iterm2',
-    'little-snitch',
     'slack',
     'the-unarchiver',
     'transmission',
@@ -63,7 +61,10 @@ module.exports = {
     'docker',
     'flux',
     'teamviewer',
-    'tomighty'
+    'tomighty',
+    'bartender',
+    'screenhero',
+    'selfcontrol'
   ],
   gem: [
     'git-up'
