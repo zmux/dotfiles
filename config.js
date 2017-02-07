@@ -66,8 +66,8 @@ module.exports = {
     'skype',
     'teamviewer',
     'tomighty',
-    'selfcontrol'
-    'screenhero',
+    'selfcontrol',
+    'screenhero'
   ],
   gem: [
     'git-up'
